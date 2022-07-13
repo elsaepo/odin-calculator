@@ -2,79 +2,131 @@ const buttonNumbers = document.querySelectorAll(".number");
 const buttonOperators = document.querySelectorAll(".operator");
 const buttonEquals = document.querySelector("#button-equals");
 const buttonClear = document.querySelector("#button-clear");
-let outputDisplay = document.querySelector("#output");
+let outputHistory = document.querySelector("#hist-output");
+let outputDisplay = document.querySelector("#num-output");
 
 
 // Operator functions
 
-function add(num1, num2){
+function add(num1, num2) {
     return num1 + num2;
 }
 
-function subtract(num1, num2){
+function subtract(num1, num2) {
     return num1 - num2;
 }
 
-function multiply(num1, num2){
+function multiply(num1, num2) {
     return num1 * num2;
 }
 
-function divide(num1, num2){
-    if (num2 === 0){
+function divide(num1, num2) {
+    if (num2 === 0) {
         return "CANNOT DIVIDE BY 0";
     };
     return num1 / num2;
 }
 
-function operate(operator, num1, num2){
+function operate(operator, num1, num2) {
     return operator(num1, num2);
 }
 
 
-let numCurrent = "";
-let numTotal = 0;
-let currentOperator;
-
-// equalButton is defined as a function so numTotal can be updated through multiple operator presses
-let equateTotal = function(){
+// equateTotal is defined as a function so numTotal can be updated through multiple operator presses
+// window[...] uses bracket notation to access the method in window. Turns string into function
+let equateTotal = function () {
     return operate(window[currentOperator], numTotal, Number(numCurrent));
 }
 
-let resetCalc = function(){
+let resetCalc = function () {
+    numHistory = "";
     numCurrent = "";
     numTotal = 0;
     currentOperator = "";
+    haveEquated = false;
+    outputHistory.textContent = "";
     outputDisplay.textContent = "";
     return;
 }
 
 
+// When passed a number or operator, addHistory() will add it in the correct format
+let addHistory = function (input) {
+    console.log(numHistory)
+    let lastInput = numHistory.toString().slice((numHistory.length - 1));
+    let blockArray = ["+", "-", "*", "/"];
+    if (Number(input)) {
+        numHistory += input;
+    } else {
+        if (blockArray.includes(lastInput)) {
+            numHistory = numHistory.slice(0, (numHistory.length - 1));
+        }
+        switch (input) {
+            case "add": numHistory += "+"; break;
+            case "subtract": numHistory += "-"; break;
+            case "multiply": numHistory += "*"; break;
+            case "divide": numHistory += "/"; break;
+            case "equals": numHistory += "="; break;
+            default: break;
+        }
+    }
+    outputHistory.textContent = numHistory;
+}
+
+let numHistory = "";
+let numCurrent = "";
+let numTotal = 0;
+let lastNumber;
+let currentOperator;
+
+// haveEquated determines if the last button press equated a total - number & operator buttons utilise this logic
+let haveEquated = false;
+
 // Button event listeners
 
-buttonNumbers.forEach(button => button.addEventListener("mousedown", function(event){
+buttonNumbers.forEach(button => button.addEventListener("mousedown", function (event) {
     let thisNumber = event.target.getAttribute("id").slice(7);
+    if (haveEquated) {
+        resetCalc();
+        haveEquated = false;
+    };
     numCurrent += thisNumber;
     outputDisplay.textContent = numCurrent;
 }))
 
-buttonOperators.forEach(button => button.addEventListener("mousedown", function(event){
+buttonOperators.forEach(button => button.addEventListener("mousedown", function (event) {
     let thisOperator = event.target.getAttribute("id").slice(7);
-    if (numTotal && numCurrent){
+    if (haveEquated) {
+        numHistory = numTotal;
+        haveEquated = false;
+    }
+    // If numTotal and numCurrent hold numbers, calculate the total before defining the new operator
+    if (numTotal !== 0 && numCurrent !== "") {
         numTotal = equateTotal();
     } else {
         numTotal += Number(numCurrent);
     }
     currentOperator = thisOperator;
+    addHistory(numCurrent);
+    addHistory(currentOperator);
+    outputDisplay.textContent = "";
     numCurrent = "";
 }))
 
-buttonEquals.addEventListener("mousedown", function(){
-    // window[...] uses bracket notation to access the method in window. Turns string into function
+buttonEquals.addEventListener("mousedown", function () {
+    // lastNu clicking the equals button multiple times in a row
+    if (haveEquated === true) {
+        numCurrent = lastNumber;
+    }
     numTotal = equateTotal();
+    addHistory(numCurrent);
+    addHistory("equals");
+    lastNumber = numCurrent;
     numCurrent = "";
     outputDisplay.textContent = numTotal;
+    haveEquated = true;
 })
 
-buttonClear.addEventListener("mousedown", function(){
+buttonClear.addEventListener("mousedown", function () {
     resetCalc();
 })
