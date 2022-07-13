@@ -36,8 +36,16 @@ let numTotal = 0;
 let currentOperator;
 
 // equalButton is defined as a function so numTotal can be updated through multiple operator presses
-let equalButton = function(){
+let equateTotal = function(){
     return operate(window[currentOperator], numTotal, Number(numCurrent));
+}
+
+let resetCalc = function(){
+    numCurrent = "";
+    numTotal = 0;
+    currentOperator = "";
+    outputDisplay.textContent = "";
+    return;
 }
 
 
@@ -52,7 +60,7 @@ buttonNumbers.forEach(button => button.addEventListener("mousedown", function(ev
 buttonOperators.forEach(button => button.addEventListener("mousedown", function(event){
     let thisOperator = event.target.getAttribute("id").slice(7);
     if (numTotal && numCurrent){
-        numTotal = equalButton();
+        numTotal = equateTotal();
     } else {
         numTotal += Number(numCurrent);
     }
@@ -62,14 +70,11 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function(
 
 buttonEquals.addEventListener("mousedown", function(){
     // window[...] uses bracket notation to access the method in window. Turns string into function
-    numTotal = equalButton();
+    numTotal = equateTotal();
     numCurrent = "";
     outputDisplay.textContent = numTotal;
 })
 
 buttonClear.addEventListener("mousedown", function(){
-    numCurrent = "";
-    numTotal = 0;
-    currentOperator = "";
-    outputDisplay.textContent = "";
+    resetCalc();
 })

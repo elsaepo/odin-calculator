@@ -5,17 +5,87 @@
 }
 
 body {
-    margin: 0;
-}
-
-h1 {
-    margin: 0;
+    margin: 5vh 0 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
     font-family: "Roboto Mono", monospace;
 }
 
+h1, p {
+    margin: 0;
+}
+
+#calc-container {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+}
+
 #output {
+    font-family: "Roboto Mono", monospace;
+    font-size: 1.2rem;
+    text-align: right;
     border: 2px solid black;
-    padding: 8px;
-    width: 100px;
+    padding: 16px 4px;
+    width: 100%;
+    height: 80px;
     display: block;
+    margin-bottom: 8px;
+}
+
+#button-container, .button-row {
+    display: flex;
+    gap: 8px;
+}
+
+#button-container {
+    flex-direction: column;
+}
+
+#button-container button {
+    font-size: 1.4rem;
+    font-weight: 700;
+    flex: 1 0 50px;
+    height: 50px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid black;
+    --opacity: 1;
+}
+
+.number {
+    background-color: rgba(222, 222, 222, var(--opacity));
+}
+
+.operator {
+    background-color: rgba(168, 196, 219, var(--opacity));
+}
+
+#button-equals {
+    background-color: rgba(140, 209, 140, var(--opacity));
+}
+
+#button-polarity, #button-percentage {
+    background-color: rgba(180, 180, 180, var(--opacity));
+}
+
+#button-clear {
+    background-color: rgba(223, 134, 137, var(--opacity));
+}
+
+#button-back {
+    background-color: rgba(224, 186, 131, var(--opacity));
+}
+
+#button-container button:hover {
+    cursor: pointer;
+    border: 4px solid black;
+    --opacity: 0.7;
+}
+
+.footer {
+    margin-top: 8px;
 }
