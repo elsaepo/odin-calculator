@@ -52,7 +52,6 @@ let resetCalc = function () {
 
 // When passed a number or operator, addHistory() will add it in the correct format
 let addHistory = function (input) {
-    console.log(numHistory)
     let lastInput = numHistory.toString().slice((numHistory.length - 1));
     let blockArray = ["+", "-", "*", "/"];
     if (Number(input)) {
@@ -61,17 +60,20 @@ let addHistory = function (input) {
         if (blockArray.includes(lastInput)) {
             numHistory = numHistory.slice(0, (numHistory.length - 1));
         }
-        switch (input) {
-            case "add": numHistory += "+"; break;
-            case "subtract": numHistory += "-"; break;
-            case "multiply": numHistory += "*"; break;
-            case "divide": numHistory += "/"; break;
-            case "equals": numHistory += "="; break;
-            default: break;
-        }
+        numHistory += convertOperatorToSymbol(input);
     }
     outputHistory.textContent = numHistory;
 }
+
+let convertOperatorToSymbol = function(operator){
+    switch (operator) {
+        case "add": return "+";
+        case "subtract": return "-";
+        case "multiply": return "*";
+        case "divide": return "/";
+        case "equals": return "=";
+        default: return;
+}}
 
 let numHistory = "";
 let numCurrent = "";
@@ -114,13 +116,16 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function 
 }))
 
 buttonEquals.addEventListener("mousedown", function () {
-    // lastNu clicking the equals button multiple times in a row
+    // lastNumber for clicking the equals button multiple times in a row
+    // This is a single edge case and bypasses addHistory()
     if (haveEquated === true) {
         numCurrent = lastNumber;
+        outputHistory.textContent = `${numTotal}${convertOperatorToSymbol(currentOperator)}${numCurrent}=`;
+    } else {
+        addHistory(numCurrent);
+        addHistory("equals");
     }
     numTotal = equateTotal();
-    addHistory(numCurrent);
-    addHistory("equals");
     lastNumber = numCurrent;
     numCurrent = "";
     outputDisplay.textContent = numTotal;
