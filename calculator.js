@@ -114,6 +114,10 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function 
     // If numTotal and numCurrent hold numbers, calculate the total before defining the new operator
     if (numTotal !== 0 && numCurrent !== "") {
         numTotal = equateTotal();
+        if (numTotal === "☠ DIVIDE 0 ☠"){
+            resetCalc();
+            return;
+        };
     } else {
         numTotal += Number(numCurrent);
     };
@@ -128,7 +132,7 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function 
 
 buttonEquals.addEventListener("mousedown", function () {
     // If there is nothing to operate on, or no operator selected, do nothing (unless we just equated)
-    if (!numCurrent && !haveEquated || !numTotal || !currentOperator) {
+    if (!numCurrent && !haveEquated || !currentOperator) {
         return;
     };
     // lastNumber for clicking the equals button multiple times in a row
