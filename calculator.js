@@ -46,9 +46,7 @@ let resetCalc = function () {
     haveEquated = false;
     outputHistory.textContent = "";
     outputDisplay.textContent = "";
-    return;
 }
-
 
 // When passed a number or operator, addHistory() will add it in the correct format
 let addHistory = function (input) {
@@ -87,6 +85,7 @@ let currentOperator;
 // haveEquated determines if the last button press equated a total - number & operator buttons utilise this logic
 let haveEquated = false;
 
+
 // Button event listeners
 
 buttonNumbers.forEach(button => button.addEventListener("mousedown", function (event) {
@@ -94,6 +93,9 @@ buttonNumbers.forEach(button => button.addEventListener("mousedown", function (e
     if (haveEquated) {
         resetCalc();
     };
+    if(numCurrent.match(/[.]/g) && thisNumber === "."){
+        return;
+    }
     numCurrent += thisNumber;
     outputDisplay.textContent = numCurrent;
 }))
