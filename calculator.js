@@ -22,7 +22,8 @@ function multiply(num1, num2) {
 
 function divide(num1, num2) {
     if (num2 === 0) {
-        return "CANNOT DIVIDE BY 0";
+        resetCalc();
+        return "☠ DIVIDE 0 ☠";
     };
     return num1 / num2;
 }
@@ -95,41 +96,41 @@ buttonNumbers.forEach(button => button.addEventListener("mousedown", function (e
     };
     if(numCurrent.match(/[.]/g) && thisNumber === "."){
         return;
-    }
+    };
     numCurrent += thisNumber;
     outputDisplay.textContent = numCurrent;
-}))
+}));
 
 buttonOperators.forEach(button => button.addEventListener("mousedown", function (event) {
     let thisOperator = event.target.getAttribute("id").slice(7);
     // If there is nothing to operate on, do nothing
-    if (!numCurrent && !numTotal) {
+    if (!numCurrent && !numTotal || numTotal === "☠ DIVIDE 0 ☠") {
         return;
-    }
+    };
     if (haveEquated) {
         numHistory = numTotal;
         haveEquated = false;
-    }
+    };
     // If numTotal and numCurrent hold numbers, calculate the total before defining the new operator
     if (numTotal !== 0 && numCurrent !== "") {
         numTotal = equateTotal();
     } else {
         numTotal += Number(numCurrent);
-    }
+    };
     currentOperator = thisOperator;
     if (!numHistory) {
         addHistory(numCurrent);
-    }
+    };
     addHistory(currentOperator);
     outputDisplay.textContent = "";
     numCurrent = "";
-}))
+}));
 
 buttonEquals.addEventListener("mousedown", function () {
     // If there is nothing to operate on, or no operator selected, do nothing (unless we just equated)
     if (!numCurrent && !haveEquated || !numTotal || !currentOperator) {
         return;
-    }
+    };
     // lastNumber for clicking the equals button multiple times in a row
     // This is a single edge case and bypasses addHistory()
     if (haveEquated === true) {
@@ -144,8 +145,8 @@ buttonEquals.addEventListener("mousedown", function () {
     numCurrent = "";
     outputDisplay.textContent = numTotal;
     haveEquated = true;
-})
+});
 
 buttonClear.addEventListener("mousedown", function () {
     resetCalc();
-})
+});
