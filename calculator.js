@@ -2,9 +2,11 @@ const buttonNumbers = document.querySelectorAll(".number");
 const buttonOperators = document.querySelectorAll(".operator");
 const buttonEquals = document.querySelector("#button-equals");
 const buttonClear = document.querySelector("#button-clear");
+const buttonBack = document.querySelector("#button-back");
+const buttonPercentage = document.querySelector("#button-percentage");
+const buttonPolarity = document.querySelector("#button-polarity")
 const outputHistory = document.querySelector("#hist-output");
 const outputDisplay = document.querySelector("#num-output");
-
 
 // Operator functions
 
@@ -135,7 +137,7 @@ buttonEquals.addEventListener("mousedown", function () {
     if (!numCurrent && !haveEquated || !currentOperator) {
         return;
     };
-    // lastNumber for clicking the equals button multiple times in a row
+    // Use lastNumber for clicking the equals button multiple times in a row
     // This is a single edge case and bypasses addHistory()
     if (haveEquated === true) {
         numCurrent = lastNumber;
@@ -151,6 +153,39 @@ buttonEquals.addEventListener("mousedown", function () {
     haveEquated = true;
 });
 
+buttonPercentage.addEventListener("mousedown", function(){
+    if (outputDisplay.textContent === numTotal.toString()){
+        numTotal = numTotal * 100;
+        outputDisplay.textContent = `${numTotal}%`
+    };
+})
+
+// Switches polarity of current variable in main output display
+buttonPolarity.addEventListener("mousedown", function(){
+    switch(outputDisplay.textContent){
+        case "":
+            numCurrent += "-";
+            outputDisplay.textContent = numCurrent;
+            break;
+        case numCurrent.toString():
+            numCurrent *= -1;
+            outputDisplay.textContent = numCurrent;
+            break;
+        case numTotal.toString():
+            numTotal *= -1;
+            outputDisplay.textContent = numTotal;
+            break;
+        default: return;
+    }
+});
+
 buttonClear.addEventListener("mousedown", function () {
     resetCalc();
 });
+
+buttonBack.addEventListener("mousedown", function(){
+    if (outputDisplay.textContent === numCurrent){
+        numCurrent = numCurrent.slice(0, numCurrent.length -1)
+        outputDisplay.textContent = numCurrent;
+    };
+})
