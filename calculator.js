@@ -2,8 +2,8 @@ const buttonNumbers = document.querySelectorAll(".number");
 const buttonOperators = document.querySelectorAll(".operator");
 const buttonEquals = document.querySelector("#button-equals");
 const buttonClear = document.querySelector("#button-clear");
-let outputHistory = document.querySelector("#hist-output");
-let outputDisplay = document.querySelector("#num-output");
+const outputHistory = document.querySelector("#hist-output");
+const outputDisplay = document.querySelector("#num-output");
 
 
 // Operator functions
@@ -57,23 +57,26 @@ let addHistory = function (input) {
     if (Number(input)) {
         numHistory += input;
     } else {
+        // Determines if the last input was an operator - if so, replace it with current operator
         if (blockArray.includes(lastInput)) {
-            numHistory = numHistory.slice(0, (numHistory.length - 1));
+            numHistory = `${numTotal}`
+            //numHistory = numHistory.slice(0, (numHistory.length - 1));
         }
         numHistory += convertOperatorToSymbol(input);
     }
     outputHistory.textContent = numHistory;
 }
 
-let convertOperatorToSymbol = function(operator){
+let convertOperatorToSymbol = function(operator) {
     switch (operator) {
         case "add": return "+";
         case "subtract": return "-";
         case "multiply": return "*";
         case "divide": return "/";
         case "equals": return "=";
-        default: return;
-}}
+        default: return operator;
+    }
+}
 
 let numHistory = "";
 let numCurrent = "";
@@ -90,7 +93,6 @@ buttonNumbers.forEach(button => button.addEventListener("mousedown", function (e
     let thisNumber = event.target.getAttribute("id").slice(7);
     if (haveEquated) {
         resetCalc();
-        haveEquated = false;
     };
     numCurrent += thisNumber;
     outputDisplay.textContent = numCurrent;
@@ -98,6 +100,10 @@ buttonNumbers.forEach(button => button.addEventListener("mousedown", function (e
 
 buttonOperators.forEach(button => button.addEventListener("mousedown", function (event) {
     let thisOperator = event.target.getAttribute("id").slice(7);
+    // If there is nothing to operate on, do nothing
+    if (!numCurrent && !numTotal) {
+        return;
+    }
     if (haveEquated) {
         numHistory = numTotal;
         haveEquated = false;
@@ -109,13 +115,19 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function 
         numTotal += Number(numCurrent);
     }
     currentOperator = thisOperator;
-    addHistory(numCurrent);
+    if (!numHistory) {
+        addHistory(numCurrent);
+    }
     addHistory(currentOperator);
     outputDisplay.textContent = "";
     numCurrent = "";
 }))
 
 buttonEquals.addEventListener("mousedown", function () {
+    // If there is nothing to operate on, or no operator selected, do nothing (unless we just equated)
+    if (!numCurrent && !haveEquated || !numTotal || !currentOperator) {
+        return;
+    }
     // lastNumber for clicking the equals button multiple times in a row
     // This is a single edge case and bypasses addHistory()
     if (haveEquated === true) {
