@@ -9,31 +9,25 @@ const outputHistory = document.querySelector("#hist-output");
 const outputDisplay = document.querySelector("#num-output");
 
 // Operator functions
-
 function add(num1, num2) {
     return num1 + num2;
-}
-
+};
 function subtract(num1, num2) {
     return num1 - num2;
-}
-
+};
 function multiply(num1, num2) {
     return num1 * num2;
-}
-
+};
 function divide(num1, num2) {
     if (num2 === 0) {
         resetCalc();
         return "☠ DIVIDE 0 ☠";
     };
     return num1 / num2;
-}
-
+};
 function operate(operator, num1, num2) {
     return operator(num1, num2);
 }
-
 
 // equateTotal is defined as a function so numTotal can be updated through multiple operator presses
 // window[...] uses bracket notation to access the method in window. Turns string into function
@@ -61,20 +55,21 @@ let addHistory = function (input) {
         // Determines if the last input was an operator - if so, replace it with current operator
         if (blockArray.includes(lastInput)) {
             numHistory = `${numTotal}`
-            //numHistory = numHistory.slice(0, (numHistory.length - 1));
         }
         numHistory += convertOperatorToSymbol(input);
     }
     outputHistory.textContent = numHistory;
 }
 
-let convertOperatorToSymbol = function(operator) {
+let convertOperatorToSymbol = function (operator) {
     switch (operator) {
         case "add": return "+";
         case "subtract": return "-";
         case "multiply": return "*";
         case "divide": return "/";
-        case "equals": return "=";
+        case "equals":
+        case "Enter":
+            return "=";
         default: return operator;
     }
 }
@@ -84,27 +79,37 @@ let numCurrent = "";
 let numTotal = 0;
 let lastNumber;
 let currentOperator;
-
 // haveEquated determines if the last button press equated a total - number & operator buttons utilise this logic
 let haveEquated = false;
 
 
-// Button event listeners
+// Functions for inputs, called in the event listeners (mousedown and keydown)
 
-buttonNumbers.forEach(button => button.addEventListener("mousedown", function (event) {
-    let thisNumber = event.target.getAttribute("id").slice(7);
+const pressNumber = function(event){
+    // Checking for event.target stops the error thrown if .getAtrribute() is called on a keydown event
+    let thisNumber;
+    if (event.target){
+        thisNumber = event.target.getAttribute("id").slice(7);
+    } else {
+        thisNumber = event;
+    }
     if (haveEquated) {
         resetCalc();
     };
-    if(numCurrent.match(/[.]/g) && thisNumber === "."){
+    if (numCurrent.match(/[.]/g) && thisNumber === ".") {
         return;
     };
     numCurrent += thisNumber;
     outputDisplay.textContent = numCurrent;
-}));
+}
 
-buttonOperators.forEach(button => button.addEventListener("mousedown", function (event) {
-    let thisOperator = event.target.getAttribute("id").slice(7);
+const pressOperator = function(event){
+    let thisOperator;
+    if (event.target){
+        thisOperator = event.target.getAttribute("id").slice(7);
+    } else {
+        thisOperator = event;
+    }
     // If there is nothing to operate on, do nothing
     if (!numCurrent && !numTotal || numTotal === "☠ DIVIDE 0 ☠") {
         return;
@@ -116,7 +121,7 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function 
     // If numTotal and numCurrent hold numbers, calculate the total before defining the new operator
     if (numTotal !== 0 && numCurrent !== "") {
         numTotal = equateTotal();
-        if (numTotal === "☠ DIVIDE 0 ☠"){
+        if (numTotal === "☠ DIVIDE 0 ☠") {
             resetCalc();
             return;
         };
@@ -130,9 +135,9 @@ buttonOperators.forEach(button => button.addEventListener("mousedown", function 
     addHistory(currentOperator);
     outputDisplay.textContent = "";
     numCurrent = "";
-}));
+}
 
-buttonEquals.addEventListener("mousedown", function () {
+const pressEquals = function(){
     // If there is nothing to operate on, or no operator selected, do nothing (unless we just equated)
     if (!numCurrent && !haveEquated || !currentOperator) {
         return;
@@ -151,18 +156,18 @@ buttonEquals.addEventListener("mousedown", function () {
     numCurrent = "";
     outputDisplay.textContent = numTotal;
     haveEquated = true;
-});
+}
 
-buttonPercentage.addEventListener("mousedown", function(){
-    if (outputDisplay.textContent === numTotal.toString()){
+const pressPercentage = function(){
+    if (outputDisplay.textContent === numTotal.toString()) {
         numTotal = numTotal * 100;
         outputDisplay.textContent = `${numTotal}%`
     };
-})
+}
 
 // Switches polarity of current variable in main output display
-buttonPolarity.addEventListener("mousedown", function(){
-    switch(outputDisplay.textContent){
+const pressPolarity = function(){
+    switch (outputDisplay.textContent) {
         case "":
             numCurrent += "-";
             outputDisplay.textContent = numCurrent;
@@ -177,15 +182,59 @@ buttonPolarity.addEventListener("mousedown", function(){
             break;
         default: return;
     }
-});
+}
 
-buttonClear.addEventListener("mousedown", function () {
+const pressClear = function(){
     resetCalc();
-});
+}
 
-buttonBack.addEventListener("mousedown", function(){
-    if (outputDisplay.textContent === numCurrent){
-        numCurrent = numCurrent.slice(0, numCurrent.length -1)
+const pressBack = function(){
+    if (outputDisplay.textContent === numCurrent) {
+        numCurrent = numCurrent.slice(0, numCurrent.length - 1)
         outputDisplay.textContent = numCurrent;
     };
+}
+
+// Button event listeners
+buttonNumbers.forEach(button => button.addEventListener("mousedown", event => pressNumber(event)));
+buttonOperators.forEach(button => button.addEventListener("mousedown", event => pressOperator(event)));
+buttonEquals.addEventListener("mousedown", pressEquals);
+buttonPercentage.addEventListener("mousedown", pressPercentage);
+buttonPolarity.addEventListener("mousedown", pressPolarity);
+buttonClear.addEventListener("mousedown", pressClear);
+buttonBack.addEventListener("mousedown", pressBack);
+
+// Keydown event listeners
+document.addEventListener("keydown", function (event) {
+    if (Number(event.key) || event.key === "0" || event.key === ".") {
+        pressNumber(event.key)
+    } else {
+        switch (event.key) {
+            case "+":
+                pressOperator("add");
+                break;
+            case "-":
+                pressOperator("subtract");
+                break;
+            case "*":
+                pressOperator("multiply");
+                break;
+            case "/":
+                pressOperator("divide");
+                break;
+            case "Enter":
+            case "=":
+                pressEquals()
+                break;
+            case "Backspace":
+                pressBack();
+                break;
+            case "%":
+                pressPercentage();
+                break;
+            default:
+                return;
+        }
+    }
+
 })
