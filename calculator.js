@@ -157,7 +157,13 @@ const pressEquals = function(){
     numTotal = equateTotal();
     lastNumber = numCurrent;
     numCurrent = "";
-    outputDisplay.textContent = numTotal;
+    // Displays numTotal to 10 significant figures (removing 0s at the end)
+    outputDisplay.textContent = numTotal.toPrecision(Math.min(10, numTotal.toString().length))
+    // If a decimal output ends in trailing 0s, remove them
+    if (outputDisplay.textContent.match(/\.*0+$/)){
+        numTotal = Number(outputDisplay.textContent.replace(/\.*0+$/, ""))
+        outputDisplay.textContent = numTotal;
+    }
     haveEquated = true;
 }
 

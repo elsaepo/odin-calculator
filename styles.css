@@ -30,6 +30,7 @@ h1, p {
     height: 80px;
     display: block;
     margin-bottom: 8px;
+    overflow: hidden;
 }
 
 #hist-output, #num-output {
@@ -43,8 +44,9 @@ h1, p {
 }
 
 #num-output {
-    font-size: 2rem;
+    font-size: 1.8rem;
     height: 55px;
+    padding-top: 12px;
 }
 
 #button-container, .button-row {
