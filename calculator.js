@@ -21,7 +21,7 @@ function multiply(num1, num2) {
 function divide(num1, num2) {
     if (num2 === 0) {
         resetCalc();
-        return "☠ DIVIDE 0 ☠";
+        return "☠ YIKES ☠";
     };
     return num1 / num2;
 };
@@ -86,6 +86,9 @@ let haveEquated = false;
 // Functions for inputs, called in the event listeners (mousedown and keydown)
 
 const pressNumber = function(event){
+    if (numCurrent.length >= 10){
+        return;
+    }
     // Checking for event.target stops the error thrown if .getAtrribute() is called on a keydown event
     let thisNumber;
     if (event.target){
@@ -96,7 +99,7 @@ const pressNumber = function(event){
     if (haveEquated) {
         resetCalc();
     };
-    if (numCurrent.match(/[.]/g) && thisNumber === ".") {
+    if (numCurrent.toString().match(/[.]/g) && thisNumber === ".") {
         return;
     };
     numCurrent += thisNumber;
@@ -111,7 +114,7 @@ const pressOperator = function(event){
         thisOperator = event;
     }
     // If there is nothing to operate on, do nothing
-    if (!numCurrent && !numTotal || numTotal === "☠ DIVIDE 0 ☠") {
+    if (!numCurrent && !numTotal || numTotal === "☠ YIKES ☠") {
         return;
     };
     if (haveEquated) {
@@ -121,7 +124,7 @@ const pressOperator = function(event){
     // If numTotal and numCurrent hold numbers, calculate the total before defining the new operator
     if (numTotal !== 0 && numCurrent !== "") {
         numTotal = equateTotal();
-        if (numTotal === "☠ DIVIDE 0 ☠") {
+        if (numTotal === "☠ YIKES ☠") {
             resetCalc();
             return;
         };
@@ -189,8 +192,12 @@ const pressClear = function(){
 }
 
 const pressBack = function(){
-    if (outputDisplay.textContent === numCurrent) {
-        numCurrent = numCurrent.slice(0, numCurrent.length - 1)
+    if (numCurrent.toString().match(/-[0-9]{1}$/)){
+        numCurrent = "";
+        outputDisplay.textContent = "";
+    }
+    if (outputDisplay.textContent === numCurrent.toString()) {
+        numCurrent = Number(numCurrent.toString().slice(0, numCurrent.toString().length - 1))
         outputDisplay.textContent = numCurrent;
     };
 }
